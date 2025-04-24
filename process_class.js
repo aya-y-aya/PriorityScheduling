@@ -1,9 +1,8 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Process = void 0;
-class Process {
+export class Process {
     constructor(processId, arrivalTime, burstTime) {
         this.isDoneProcessing = false;
+        this.arrivalTimes = [];
+        this.completionTimes = [];
         this.processId = processId;
         this.arrivalTime = arrivalTime;
         this.burstTime = burstTime;
@@ -62,5 +61,16 @@ class Process {
     getResponseTime() {
         return this.responseTime;
     }
+    pushToArrivalTimes(arrivalTime) {
+        this.arrivalTimes.push(arrivalTime);
+    }
+    getArrivalTimes() {
+        return this.arrivalTimes;
+    }
+    pushToCompletionTimes(completionTime) {
+        this.completionTimes.push(completionTime);
+    }
+    getCompletionTimes() {
+        return this.completionTimes;
+    }
 }
-exports.Process = Process;

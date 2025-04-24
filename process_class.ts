@@ -9,6 +9,8 @@ export class Process {
     private responseTime: number;
     private firstArrivalTime: number;
     private isDoneProcessing: boolean = false;
+    private arrivalTimes: number[] = [];
+    private completionTimes: number[] = [];
 
     public constructor(processId: number, arrivalTime: number, burstTime: number) {
         this.processId = processId;
@@ -82,6 +84,22 @@ export class Process {
 
     public getResponseTime() {
         return this.responseTime;
+    }
+
+    public pushToArrivalTimes(arrivalTime: number) {
+        this.arrivalTimes.push(arrivalTime);
+    }
+
+    public getArrivalTimes() {
+        return this.arrivalTimes;
+    }
+
+    public pushToCompletionTimes(completionTime: number) {
+        this.completionTimes.push(completionTime);
+    }
+
+    public getCompletionTimes() {
+        return this.completionTimes;
     }
 
 }

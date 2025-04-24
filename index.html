@@ -8,6 +8,9 @@
             rel="stylesheet"
             href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css"
         />
+        <link rel="stylesheet" href="style.css">
+        <script src="round_robin.js" type="module"></script>
+        <script src="process_class.js" type="module"></script>
     </head>
     <body>
         <section class="section">
@@ -18,26 +21,56 @@
         </section>
 
         <div class="container">
-            <table class="table">
+            <div class="container mb-6">
+                <p class="mb-4">Time Quantum</p>
+                <input type="number" class="input" />
+            </div>
+
+            <table class="table is-fullwidth">
                 <thead>
                     <tr>
-                        <th>Process</th>
+                        <th class="has-text-centered">Process</th>
                         <th class="has-text-centered">Arrival Time</th>
                         <th class="has-text-centered">Burst Time</th>
-                        <th>Turn Around Time</th>
-                        <th>Waiting Time</th>
-                        <th>Response Time</th>
+                        <th class="has-text-centered">Turn Around Time</th>
+                        <th class="has-text-centered">Waiting Time</th>
+                        <th class="has-text-centered">Response Time</th>
                     </tr>
                 </thead>
                 <tfoot>
                     <tr>
-                        <th colspan="6"><input type="button" value="Add Row" class="button is-dark is-primary"></th>
+                        <th colspan="2">
+                            <input
+                                type="button"
+                                value="Add Row"
+                                class="button is-dark is-primary"
+                            />
+                            <input
+                                type="button"
+                                value="Submit"
+                                class="button is-dark is-primary"
+                            />
+                        </th>
+                        <th></th>
+                        <th class="has-text-centered">
+                            Average Turn Around Time:
+                        </th>
+                        <th class="has-text-centered">Average Waiting Time:</th>
+                        <th class="has-text-centered">
+                            Average Response Time:
+                        </th>
                     </tr>
                 </tfoot>
                 <tbody>
-                    <th class="has-text-centered is-align-content-center">P1</th>
-                    <td class="has-text-centered is-align-content-center"><input type="number" class="input"></td>
-                    <td class="has-text-centered is-align-content-center"><input type="number" class="input"></td>
+                    <th class="has-text-centered is-align-content-center">
+                        P1
+                    </th>
+                    <td class="has-text-centered is-align-content-center">
+                        <input type="number" class="input" />
+                    </td>
+                    <td class="has-text-centered is-align-content-center">
+                        <input type="number" class="input" />
+                    </td>
                     <td class="has-text-centered is-align-content-center">-</td>
                     <td class="has-text-centered is-align-content-center">-</td>
                     <td class="has-text-centered is-align-content-center">-</td>
@@ -45,8 +78,11 @@
             </table>
         </div>
 
-        <div class="container mt-6">
-            <h1 class="title">GANTT CHART GOES HERE</h1>
+        <div class="container mt-6 mb-6">
+            <h1 class="title">GANTT CHART (HARDCODED YUNG GIVEN)</h1>
+            <div id="number-bar" class="container"></div>
+            <div id="gantt-chart" class="container">
+            </div>
         </div>
     </body>
 </html>
