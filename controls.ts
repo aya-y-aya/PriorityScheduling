@@ -140,6 +140,9 @@ submitButton.addEventListener("click", () => {
 
             responseTime.textContent = processValues[index].getResponseTime().toString();
             responseTimeSum += processValues[index].getResponseTime();
+
+            console.log(processValues[index].getArrivalTimes());
+            console.log(processValues[index].getCompletionTimes());
         }
 
         const averageTurnaroundTime = turnaroundTimeSum / turnaroundTimestd.length
@@ -150,9 +153,9 @@ submitButton.addEventListener("click", () => {
         const averageResponseTimeCell = document.getElementById("average-response-time") as HTMLTableCellElement
         const averageWaitingTimeCell = document.getElementById("average-waiting-time") as HTMLTableCellElement;
 
-        averageTurnaroundTimeCell.textContent =`Average Turn Around Time:\n${averageTurnaroundTime.toString()}`;
-        averageResponseTimeCell.textContent = `Average Response Time\n ${averageResponseTime.toString()}`;
-        averageWaitingTimeCell.textContent = `Average Waiting Time\n ${averageWaitingTime.toString()}`;
+        averageTurnaroundTimeCell.textContent =`Average Turn Around Time:\n${averageTurnaroundTime.toFixed(2).toString()}`;
+        averageResponseTimeCell.textContent = `Average Response Time:\n${averageResponseTime.toFixed(2).toString()}`;
+        averageWaitingTimeCell.textContent = `Average Waiting Time:\n${averageWaitingTime.toFixed(2).toString()}`;
 
 
     }
