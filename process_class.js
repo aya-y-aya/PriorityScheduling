@@ -1,5 +1,5 @@
 export class Process {
-    constructor(processId, arrivalTime, burstTime) {
+    constructor(processId, arrivalTime, burstTime, contextSwitch) {
         this.isDoneProcessing = false;
         this.arrivalTimes = [];
         this.completionTimes = [];
@@ -12,6 +12,7 @@ export class Process {
         this.waitingTime = -1;
         this.responseTime = -1;
         this.firstArrivalTime = -1;
+        this.contextSwitch = contextSwitch;
     }
     computeValues(completionTime) {
         this.completionTime = completionTime;
@@ -27,6 +28,12 @@ export class Process {
     }
     addArrivalTime(timeQuanta) {
         this.arrivalTime += timeQuanta;
+    }
+    getContextSwitching(){
+        return this.contextSwitch;
+    }
+    addContextSwitching(contextSwitch) {
+        this.arrivalTime += contextSwitch;
     }
     setFirstArrivalTime(firstArrivalTime) {
         this.firstArrivalTime = firstArrivalTime;
