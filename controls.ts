@@ -13,8 +13,9 @@ let processNumber = 1;
 addRowButton.addEventListener("click", () => {
     processNumber++;
 
-    tableBody.innerHTML += 
-    `<tr>
+    const newRow = document.createElement("tr");
+
+    newRow.innerHTML = `
         <th class="has-text-centered is-align-content-center">P${processNumber}</th>
         <td class="has-text-centered is-align-content-center">
             <input min="0" required type="number" class="input arrival-time" />
@@ -26,8 +27,11 @@ addRowButton.addEventListener("click", () => {
         <td class="has-text-centered is-align-content-center turn-around-time">-</td>
         <td class="has-text-centered is-align-content-center waiting-time">-</td>
         <td class="has-text-centered is-align-content-center response-time">-</td>
-    </tr>`
-})
+    `;
+
+    tableBody.appendChild(newRow);
+});
+
 
 decreaseRowButton.addEventListener("click", () => {
     const items = tableBody.querySelectorAll("tr")
