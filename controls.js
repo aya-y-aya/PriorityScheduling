@@ -154,3 +154,5 @@ submitButton.addEventListener("click", () => {
 timeQuantumInput.addEventListener("focus", () => {
     timeQuantumInput.classList.remove("is-danger");
 });
+
+// TO DO: CPU Utilization and Ave Idle Time
