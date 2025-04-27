@@ -80,6 +80,27 @@ submitButton.addEventListener("click", () => {
     });    
 
     if (isValid) {
+        if (arrivalTimesInputs.length <= 1) {
+            // Only one process, don't compute
+        
+            const averageTurnaroundTimeCell = document.getElementById("average-turnaround-time") as HTMLElement;
+            const averageResponseTimeCell = document.getElementById("average-response-time") as HTMLElement;
+            const averageWaitingTimeCell = document.getElementById("average-waiting-time") as HTMLElement;
+        
+            averageTurnaroundTimeCell.textContent = `Average Turn Around Time:\n0`;
+            averageResponseTimeCell.textContent = `Average Response Time:\n0`;
+            averageWaitingTimeCell.textContent = `Average Waiting Time:\n0`;
+        
+            // Clear Gantt Chart
+            const ganttChartContainer = document.getElementById("gantt-chart") as HTMLElement;
+            const numberBar = document.getElementById("number-bar") as HTMLElement;
+        
+            ganttChartContainer.innerHTML = "";
+            numberBar.innerHTML = "";
+        
+            return; // Stop executing further
+        }
+        
         let turnaroundTimeSum: number = 0;
         let responseTimeSum: number = 0;
         let waitingTimeSum: number = 0;

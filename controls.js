@@ -66,6 +66,26 @@ submitButton.addEventListener("click", () => {
         }
     });
     if (isValid) {
+        if (arrivalTimesInputs.length <= 1) {
+            // Only one process, don't compute
+        
+            const averageTurnaroundTimeCell = document.getElementById("average-turnaround-time");
+            const averageResponseTimeCell = document.getElementById("average-response-time");
+            const averageWaitingTimeCell = document.getElementById("average-waiting-time");
+        
+            averageTurnaroundTimeCell.textContent = `Average Turn Around Time:\n0`;
+            averageResponseTimeCell.textContent = `Average Response Time:\n0`;
+            averageWaitingTimeCell.textContent = `Average Waiting Time:\n0`;
+        
+            // Clear Gantt Chart
+            const ganttChartContainer = document.getElementById("gantt-chart");
+            const numberBar = document.getElementById("number-bar");
+        
+            ganttChartContainer.innerHTML = "";
+            numberBar.innerHTML = "";
+        
+            return; // Stop executing further
+        }
         let turnaroundTimeSum = 0;
         let responseTimeSum = 0;
         let waitingTimeSum = 0;
