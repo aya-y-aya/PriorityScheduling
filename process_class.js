@@ -13,12 +13,19 @@ export class Process {
         this.responseTime = -1;
         this.firstArrivalTime = -1;
         this.contextSwitch = contextSwitch;
+        this.cpuUtilization = 0;
     }
     computeValues(completionTime) {
         this.completionTime = completionTime;
         this.turnaroundTime = this.completionTime - this.arrivalTime;
         this.waitingTime = this.turnaroundTime - this.burstTime;
         this.responseTime = this.firstArrivalTime - this.arrivalTime;
+    }
+    getContextSwitching() {
+        return this.contextSwitch;
+    }
+    addContextSwitching(contextSwitch) {
+        this.arrivalTime += contextSwitch;
     }
     getCompletionTime() {
         return this.completionTime;
@@ -28,12 +35,6 @@ export class Process {
     }
     addArrivalTime(timeQuanta) {
         this.arrivalTime += timeQuanta;
-    }
-    getContextSwitching(){
-        return this.contextSwitch;
-    }
-    addContextSwitching(contextSwitch) {
-        this.arrivalTime += contextSwitch;
     }
     setFirstArrivalTime(firstArrivalTime) {
         this.firstArrivalTime = firstArrivalTime;

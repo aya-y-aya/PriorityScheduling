@@ -1,13 +1,10 @@
 import { Process } from "./process_class.js";
 import { RoundRobin } from "./round_robin.js";
-
 const tableBody = document.getElementById("table-body");
 const addRowButton = document.getElementById("add-row-button");
 const decreaseRowButton = document.getElementById("decrease-row-button");
 const submitButton = document.getElementById("submit-button");
 const timeQuantumInput = document.getElementById("time-quantum-input");
-const contextSwitchInput = document.getElementById("context-switch-input");
-
 let processNumber = 1;
 addRowButton.addEventListener("click", () => {
     processNumber++;
@@ -34,12 +31,11 @@ decreaseRowButton.addEventListener("click", () => {
         const lastItem = items[items.length - 1];
         tableBody.removeChild(lastItem);
     }
-    console.log(items);
 });
-
 submitButton.addEventListener("click", () => {
     const arrivalTimesInputs = tableBody.querySelectorAll(".arrival-time");
     const burstTimesInputs = tableBody.querySelectorAll(".burst-time");
+    const contextSwitchInput = document.getElementById("context-switch-input");
     let isValid = true;
     if (!timeQuantumInput.value) {
         timeQuantumInput.classList.add("is-danger");
@@ -73,13 +69,11 @@ submitButton.addEventListener("click", () => {
             const averageWaitingTimeCell = document.getElementById("average-waiting-time");
             const cpuUtilizationCell = document.getElementById("cpu-utilization");
             const aveIdleTimeCell = document.getElementById("ave-idle-time");
-        
             averageTurnaroundTimeCell.textContent = `Average Turn Around Time:\n0`;
             averageResponseTimeCell.textContent = `Average Response Time:\n0`;
             averageWaitingTimeCell.textContent = `Average Waiting Time:\n0`;
             cpuUtilizationCell.textContent = `0`;
             aveIdleTimeCell.textContent = `0`;
-        
             // Clear Gantt Chart
             const ganttChartContainer = document.getElementById("gantt-chart");
             const numberBar = document.getElementById("number-bar");
@@ -93,6 +87,7 @@ submitButton.addEventListener("click", () => {
         let expectedTotalBurstTime = 0;
         let finalCompletionTime = 0;
         const processValues = [];
+        console.log(contextSwitchInput.value);
         for (let index = 0; index < arrivalTimesInputs.length; index++) {
             const arrivalTimesInput = arrivalTimesInputs[index];
             const burstTimeInput = burstTimesInputs[index];
@@ -101,7 +96,6 @@ submitButton.addEventListener("click", () => {
         }
         const roundRobin = new RoundRobin(processValues, Number(timeQuantumInput.value), Number(contextSwitchInput.value));
         roundRobin.computeProcess();
-        console.log(processValues);
         const completionTimestd = tableBody.querySelectorAll(".completion-time");
         const turnaroundTimestd = tableBody.querySelectorAll(".turn-around-time");
         const waitingTimestd = tableBody.querySelectorAll(".waiting-time");
@@ -118,16 +112,16 @@ submitButton.addEventListener("click", () => {
             waitingTimeSum += processValues[index].getWaitingTime();
             responseTime.textContent = processValues[index].getResponseTime().toString();
             responseTimeSum += processValues[index].getResponseTime();
-            console.log(processValues[index].getArrivalTimes());
-            console.log(processValues[index].getCompletionTimes());
         }
         burstTimesInputs.forEach(element => {
-            expectedTotalBurstTime += burstTimesInputs[element];
+            const burstTime = element;
+            expectedTotalBurstTime += Number(burstTime.innerText);
         });
         completionTimestd.forEach(element => {
-           if(completionTimestd[element] > finalCompletionTime){
-                finalCompletionTime = completionTimestd[element];
-           }
+            const completionTime = element;
+            if (Number(completionTime.innerText) > finalCompletionTime) {
+                finalCompletionTime = Number(completionTime.innerText);
+            }
         });
         const averageTurnaroundTime = turnaroundTimeSum / turnaroundTimestd.length;
         const averageResponseTime = responseTimeSum / turnaroundTimestd.length;
@@ -142,12 +136,10 @@ submitButton.addEventListener("click", () => {
         averageTurnaroundTimeCell.textContent = `Average Turn Around Time:\n${averageTurnaroundTime.toFixed(2).toString()}`;
         averageResponseTimeCell.textContent = `Average Response Time:\n${averageResponseTime.toFixed(2).toString()}`;
         averageWaitingTimeCell.textContent = `Average Waiting Time:\n${averageWaitingTime.toFixed(2).toString()}`;
-        cpuUtilizationCell.textContent = `${cpuUtilization.toFixed(2)}%`;
-        aveIdleTimeCell.textContent = `${aveIdleTime.toFixed(2)}`;
+        cpuUtilizationCell.textContent = cpuUtilization.toFixed(2).toString();
+        aveIdleTimeCell.textContent = aveIdleTime.toFixed(2).toString();
     }
 });
 timeQuantumInput.addEventListener("focus", () => {
     timeQuantumInput.classList.remove("is-danger");
 });
-
-// TO DO: CPU Utilization and Ave Idle Time

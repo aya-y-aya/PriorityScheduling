@@ -3,14 +3,17 @@ import { Process } from "./process_class.js";
 export class RoundRobin {
     private processes: Process[];
     private timeQuanta : number;
+    private contextSwitch: number;
 
-    public constructor(processes: Process[], timeQuanta: number) {
+    public constructor(processes: Process[], timeQuanta: number, contextSwitch: number) {
         this.processes = processes;
         this.timeQuanta = timeQuanta;
+        this.contextSwitch = contextSwitch;
     }
 
     public computeProcess() {
         const timeQuanta: number = this.timeQuanta;
+        const contextSwitch = this.contextSwitch;
         var time: number = 0;
         var processDone: number = 0;
         var readyQueueIndex: number = 0;
@@ -77,6 +80,10 @@ export class RoundRobin {
                         );
                     }
 
+                    if(contextSwitch > 0) {
+                        processTime+=contextSwitch;
+                    }
+
                     this.processes[readyQueue[readyQueueIndex]].pushToCompletionTimes(
                         processTime
                     );
@@ -113,7 +120,11 @@ export class RoundRobin {
                 ) {
                     ganttChartInnerHtml +=
                         '<div class="has-background-primary has-text-black"></div>';
-                } else {
+                } else if (index1 + contextSwitch == completionTimes[timesIndex] && contextSwitch > 0) {
+                    ganttChartInnerHtml +=
+                        '<div class="has-background-white has-text-black"></div>';
+                }
+                else {
                     ganttChartInnerHtml +=
                         '<div class="has-background has-text-black"></div>';
                 }

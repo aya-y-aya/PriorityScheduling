@@ -7,7 +7,6 @@ const decreaseRowButton = document.getElementById("decrease-row-button") as HTML
 const submitButton = document.getElementById("submit-button") as HTMLInputElement
 const timeQuantumInput = document.getElementById("time-quantum-input") as HTMLInputElement
 
-
 let processNumber = 1;
 
 addRowButton.addEventListener("click", () => {
@@ -41,13 +40,12 @@ decreaseRowButton.addEventListener("click", () => {
         const lastItem = items[items.length - 1]
         tableBody.removeChild(lastItem);
     }
-
-    console.log(items)
 })
 
 submitButton.addEventListener("click", () => {
     const arrivalTimesInputs = tableBody.querySelectorAll(".arrival-time")
     const burstTimesInputs = tableBody.querySelectorAll(".burst-time")
+    const contextSwitchInput = document.getElementById("context-switch-input") as HTMLInputElement
     let isValid = true;
 
     if(!timeQuantumInput.value) {
@@ -86,10 +84,15 @@ submitButton.addEventListener("click", () => {
             const averageTurnaroundTimeCell = document.getElementById("average-turnaround-time") as HTMLElement;
             const averageResponseTimeCell = document.getElementById("average-response-time") as HTMLElement;
             const averageWaitingTimeCell = document.getElementById("average-waiting-time") as HTMLElement;
+            const cpuUtilizationCell = document.getElementById("cpu-utilization") as HTMLElement;
+            const aveIdleTimeCell = document.getElementById("ave-idle-time") as HTMLElement;
+        
         
             averageTurnaroundTimeCell.textContent = `Average Turn Around Time:\n0`;
             averageResponseTimeCell.textContent = `Average Response Time:\n0`;
             averageWaitingTimeCell.textContent = `Average Waiting Time:\n0`;
+            cpuUtilizationCell.textContent = `0`;
+            aveIdleTimeCell.textContent = `0`;
         
             // Clear Gantt Chart
             const ganttChartContainer = document.getElementById("gantt-chart") as HTMLElement;
@@ -104,20 +107,22 @@ submitButton.addEventListener("click", () => {
         let turnaroundTimeSum: number = 0;
         let responseTimeSum: number = 0;
         let waitingTimeSum: number = 0;
+        let expectedTotalBurstTime = 0;
+        let finalCompletionTime = 0;
         const processValues : Process[] = [];
+        console.log(contextSwitchInput.value)
 
         for (let index = 0; index < arrivalTimesInputs.length; index++) {
             const arrivalTimesInput = arrivalTimesInputs[index] as HTMLInputElement
             const burstTimeInput = burstTimesInputs[index] as HTMLInputElement
 
-            const process : Process = new Process(index, Number(arrivalTimesInput.value), Number(burstTimeInput.value));
+            const process : Process = new Process(index, Number(arrivalTimesInput.value), Number(burstTimeInput.value), Number(contextSwitchInput.value));
 
             processValues.push(process)
         }
 
-        const roundRobin = new RoundRobin(processValues, Number(timeQuantumInput.value));
+        const roundRobin = new RoundRobin(processValues, Number(timeQuantumInput.value), Number(contextSwitchInput.value));
         roundRobin.computeProcess();
-        console.log(processValues);
 
         const completionTimestd = tableBody.querySelectorAll(".completion-time")
         const turnaroundTimestd = tableBody.querySelectorAll(".turn-around-time")
@@ -140,22 +145,39 @@ submitButton.addEventListener("click", () => {
 
             responseTime.textContent = processValues[index].getResponseTime().toString();
             responseTimeSum += processValues[index].getResponseTime();
-
-            console.log(processValues[index].getArrivalTimes());
-            console.log(processValues[index].getCompletionTimes());
         }
+
+        burstTimesInputs.forEach(element => {
+            const burstTime = element as HTMLElement
+
+            expectedTotalBurstTime += Number(burstTime.innerText)
+        })
+
+        completionTimestd.forEach(element => {
+            const completionTime = element as HTMLElement
+
+           if(Number(completionTime.innerText) > finalCompletionTime){
+                finalCompletionTime = Number(completionTime.innerText);
+           }
+        });
 
         const averageTurnaroundTime = turnaroundTimeSum / turnaroundTimestd.length
         const averageResponseTime = responseTimeSum / turnaroundTimestd.length
         const averageWaitingTime = waitingTimeSum / turnaroundTimestd.length
+        const cpuUtilization = expectedTotalBurstTime / finalCompletionTime;
+        const aveIdleTime = finalCompletionTime - expectedTotalBurstTime;
 
         const averageTurnaroundTimeCell = document.getElementById("average-turnaround-time") as HTMLTableCellElement
         const averageResponseTimeCell = document.getElementById("average-response-time") as HTMLTableCellElement
         const averageWaitingTimeCell = document.getElementById("average-waiting-time") as HTMLTableCellElement;
+        const cpuUtilizationCell = document.getElementById("cpu-utilization") as HTMLTableCellElement;
+        const aveIdleTimeCell = document.getElementById("ave-idle-time") as HTMLTableCellElement;
 
         averageTurnaroundTimeCell.textContent =`Average Turn Around Time:\n${averageTurnaroundTime.toFixed(2).toString()}`;
         averageResponseTimeCell.textContent = `Average Response Time:\n${averageResponseTime.toFixed(2).toString()}`;
         averageWaitingTimeCell.textContent = `Average Waiting Time:\n${averageWaitingTime.toFixed(2).toString()}`;
+        cpuUtilizationCell.textContent = cpuUtilization.toFixed(2).toString();
+        aveIdleTimeCell.textContent = aveIdleTime.toFixed(2).toString();
 
 
     }

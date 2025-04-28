@@ -50,8 +50,8 @@ export class RoundRobin {
                         completionTime = processTime;
                         this.processes[readyQueue[readyQueueIndex]].computeValues(processTime);
                     }
-                    if(contextSwitch > 0){
-                        processTime+=contextSwitch;
+                    if (contextSwitch > 0) {
+                        processTime += contextSwitch;
                     }
                     this.processes[readyQueue[readyQueueIndex]].pushToCompletionTimes(processTime);
                     readyQueueIndex++;
@@ -75,12 +75,12 @@ export class RoundRobin {
             const arrivalTimes = this.processes[index].getArrivalTimes();
             const completionTimes = this.processes[index].getCompletionTimes();
             for (let index1 = 0; index1 < completionTime; index1++) {
-                if (index1 >= arrivalTimes[timesIndex] &&
-                    index1 + contextSwitch < completionTimes[timesIndex]) {
+                if ((index1 >= arrivalTimes[timesIndex] &&
+                    index1 < completionTimes[timesIndex])) {
                     ganttChartInnerHtml +=
                         '<div class="has-background-primary has-text-black"></div>';
                 }
-                else if(index1 + contextSwitch == completionTimes[timesIndex] && contextSwitch > 0){
+                else if (index1 + contextSwitch == completionTimes[timesIndex] && contextSwitch > 0) {
                     ganttChartInnerHtml +=
                         '<div class="has-background-white has-text-black"></div>';
                 }

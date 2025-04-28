@@ -11,8 +11,10 @@ export class Process {
     private isDoneProcessing: boolean = false;
     private arrivalTimes: number[] = [];
     private completionTimes: number[] = [];
+    private contextSwitch: number;
+    private cpuUtilization: number;
 
-    public constructor(processId: number, arrivalTime: number, burstTime: number) {
+    public constructor(processId: number, arrivalTime: number, burstTime: number, contextSwitch: number) {
         this.processId = processId;
         this.arrivalTime = arrivalTime;
         this. burstTime = burstTime;
@@ -22,6 +24,8 @@ export class Process {
         this.waitingTime = -1;
         this.responseTime = -1;
         this.firstArrivalTime = -1;
+        this.contextSwitch = contextSwitch;
+        this.cpuUtilization = 0;
     }
 
     public computeValues(completionTime: number) {
@@ -29,6 +33,14 @@ export class Process {
         this.turnaroundTime = this.completionTime - this.arrivalTime;
         this.waitingTime = this.turnaroundTime - this.burstTime;
         this.responseTime = this.firstArrivalTime - this.arrivalTime;
+    }
+
+    public getContextSwitching(){
+        return this.contextSwitch;
+    }
+
+    public addContextSwitching(contextSwitch: number) {
+        this.arrivalTime += contextSwitch;
     }
 
     public getCompletionTime() {
