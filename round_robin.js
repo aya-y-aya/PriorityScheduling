@@ -31,7 +31,7 @@ export class RoundRobin {
                     }
                 });
             }
-            if (readyQueueIndex >= 0) {
+            if (readyQueue.length > 0) {
                 ongoingProcess++;
                 if (ongoingProcess > timeQuanta) {
                     ongoingProcess = 1;
@@ -56,6 +56,9 @@ export class RoundRobin {
                     this.processes[readyQueue[readyQueueIndex]].pushToCompletionTimes(processTime);
                     readyQueueIndex++;
                 }
+            }
+            else {
+                processTime++;
             }
             time++;
         }
@@ -85,7 +88,7 @@ export class RoundRobin {
                     ganttChartInnerHtml +=
                         '<div class="has-background has-text-black"></div>';
                 }
-                if (completionTimes[timesIndex] == index1) {
+                if ((completionTimes[timesIndex] - 1) == index1) {
                     timesIndex++;
                 }
             }
@@ -93,10 +96,3 @@ export class RoundRobin {
         ganttChartContainer.innerHTML = ganttChartInnerHtml;
     }
 }
-// const processes: Process[] = [
-//     new Process(0, 0, 8),
-//     new Process(1, 5, 2),
-//     new Process(2, 1, 7),
-//     new Process(3, 6, 3),
-//     new Process(4, 8, 5),
-// ]; okay
