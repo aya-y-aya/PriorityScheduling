@@ -7,6 +7,7 @@ const submitButton = document.getElementById("submit-button");
 const timeQuantumInput = document.getElementById("time-quantum-input");
 let processNumber = 1;
 addRowButton.addEventListener("click", () => {
+    console.log("Add");
     processNumber++;
     const newRow = document.createElement("tr");
     newRow.innerHTML = `
@@ -22,20 +23,48 @@ addRowButton.addEventListener("click", () => {
         <td class="has-text-centered is-align-content-center waiting-time">-</td>
         <td class="has-text-centered is-align-content-center response-time">-</td>
     `;
+    const completionTimestd = tableBody.querySelectorAll(".completion-time");
+    const turnaroundTimestd = tableBody.querySelectorAll(".turn-around-time");
+    const waitingTimestd = tableBody.querySelectorAll(".waiting-time");
+    const responseTimestd = tableBody.querySelectorAll(".response-time");
+    for (let index = 0; index < completionTimestd.length; index++) {
+        const completionTime = completionTimestd[index];
+        const turnaroundTime = turnaroundTimestd[index];
+        const waitingTime = waitingTimestd[index];
+        const responseTime = responseTimestd[index];
+        completionTime.textContent = "-";
+        turnaroundTime.textContent = "-";
+        waitingTime.textContent = "-";
+        responseTime.textContent = "-";
+    }
     tableBody.appendChild(newRow);
 });
 decreaseRowButton.addEventListener("click", () => {
+    console.log("Decrease");
     const items = tableBody.querySelectorAll("tr");
     if (items.length > 1) {
         processNumber--;
         const lastItem = items[items.length - 1];
         tableBody.removeChild(lastItem);
     }
+    const completionTimestd = tableBody.querySelectorAll(".completion-time");
+    const turnaroundTimestd = tableBody.querySelectorAll(".turn-around-time");
+    const waitingTimestd = tableBody.querySelectorAll(".waiting-time");
+    const responseTimestd = tableBody.querySelectorAll(".response-time");
+    for (let index = 0; index < completionTimestd.length; index++) {
+        const completionTime = completionTimestd[index];
+        const turnaroundTime = turnaroundTimestd[index];
+        const waitingTime = waitingTimestd[index];
+        const responseTime = responseTimestd[index];
+        completionTime.textContent = "-";
+        turnaroundTime.textContent = "-";
+        waitingTime.textContent = "-";
+        responseTime.textContent = "-";
+    }
 });
 submitButton.addEventListener("click", () => {
     const arrivalTimesInputs = tableBody.querySelectorAll(".arrival-time");
     const burstTimesInputs = tableBody.querySelectorAll(".burst-time");
-    const contextSwitchInput = document.getElementById("context-switch-input");
     let isValid = true;
     if (!timeQuantumInput.value) {
         timeQuantumInput.classList.add("is-danger");
@@ -87,14 +116,13 @@ submitButton.addEventListener("click", () => {
         let expectedTotalBurstTime = 0;
         let finalCompletionTime = 0;
         const processValues = [];
-        console.log(contextSwitchInput.value);
         for (let index = 0; index < arrivalTimesInputs.length; index++) {
             const arrivalTimesInput = arrivalTimesInputs[index];
             const burstTimeInput = burstTimesInputs[index];
-            const process = new Process(index, Number(arrivalTimesInput.value), Number(burstTimeInput.value), Number(contextSwitchInput.value));
+            const process = new Process(index, Number(arrivalTimesInput.value), Number(burstTimeInput.value), 0);
             processValues.push(process);
         }
-        const roundRobin = new RoundRobin(processValues, Number(timeQuantumInput.value), Number(contextSwitchInput.value));
+        const roundRobin = new RoundRobin(processValues, Number(timeQuantumInput.value), 0);
         roundRobin.computeProcess();
         const completionTimestd = tableBody.querySelectorAll(".completion-time");
         const turnaroundTimestd = tableBody.querySelectorAll(".turn-around-time");
@@ -126,20 +154,30 @@ submitButton.addEventListener("click", () => {
         const averageTurnaroundTime = turnaroundTimeSum / turnaroundTimestd.length;
         const averageResponseTime = responseTimeSum / turnaroundTimestd.length;
         const averageWaitingTime = waitingTimeSum / turnaroundTimestd.length;
-        const cpuUtilization = expectedTotalBurstTime / finalCompletionTime;
-        const aveIdleTime = finalCompletionTime - expectedTotalBurstTime;
         const averageTurnaroundTimeCell = document.getElementById("average-turnaround-time");
         const averageResponseTimeCell = document.getElementById("average-response-time");
         const averageWaitingTimeCell = document.getElementById("average-waiting-time");
-        const cpuUtilizationCell = document.getElementById("cpu-utilization");
-        const aveIdleTimeCell = document.getElementById("ave-idle-time");
         averageTurnaroundTimeCell.textContent = `Average Turn Around Time:\n${averageTurnaroundTime.toFixed(2).toString()}`;
         averageResponseTimeCell.textContent = `Average Response Time:\n${averageResponseTime.toFixed(2).toString()}`;
         averageWaitingTimeCell.textContent = `Average Waiting Time:\n${averageWaitingTime.toFixed(2).toString()}`;
-        cpuUtilizationCell.textContent = cpuUtilization.toFixed(2).toString();
-        aveIdleTimeCell.textContent = aveIdleTime.toFixed(2).toString();
     }
 });
 timeQuantumInput.addEventListener("focus", () => {
     timeQuantumInput.classList.remove("is-danger");
 });
+function clearCells() {
+    const completionTimestd = tableBody.querySelectorAll(".completion-time");
+    const turnaroundTimestd = tableBody.querySelectorAll(".turn-around-time");
+    const waitingTimestd = tableBody.querySelectorAll(".waiting-time");
+    const responseTimestd = tableBody.querySelectorAll(".response-time");
+    for (let index = 0; index < completionTimestd.length; index++) {
+        const completionTime = completionTimestd[index];
+        const turnaroundTime = turnaroundTimestd[index];
+        const waitingTime = waitingTimestd[index];
+        const responseTime = responseTimestd[index];
+        completionTime.innerHTML = "-";
+        turnaroundTime.innerHTML = "-";
+        waitingTime.innerText = "-";
+        responseTime.innerText = "-";
+    }
+}
