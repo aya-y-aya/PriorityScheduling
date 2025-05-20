@@ -90,12 +90,12 @@ submitButton.addEventListener("click", () => {
     }
 
     priorityNumberInputs.forEach(priorityNumbers => {
-        const priorityNumberInputs = priorityNumbers as HTMLInputElement
+        const priorityNumberInput = priorityNumbers as HTMLInputElement
 
-        if (!priorityNumberInputs.value) {
-            priorityNumberInputs.classList.add("is-danger");
-            priorityNumberInputs.addEventListener("focus", () => {
-                priorityNumberInputs.classList.remove("is-danger")
+        if (!priorityNumberInput.value) {
+            priorityNumberInput.classList.add("is-danger");
+            priorityNumberInput.addEventListener("focus", () => {
+                priorityNumberInput.classList.remove("is-danger")
                 isValid = false;
             })
         }
@@ -160,10 +160,11 @@ submitButton.addEventListener("click", () => {
         const processValues : Process[] = [];
 
         for (let index = 0; index < arrivalTimesInputs.length; index++) {
+            const priorityNumberInput = arrivalTimesInputs[index] as HTMLInputElement
             const arrivalTimesInput = arrivalTimesInputs[index] as HTMLInputElement
             const burstTimeInput = burstTimesInputs[index] as HTMLInputElement
 
-            const process : Process = new Process(index, Number(arrivalTimesInput.value), Number(burstTimeInput.value), 0);
+            const process : Process = new Process(index, Number(priorityNumberInput.value),Number(arrivalTimesInput.value), Number(burstTimeInput.value), 0);
 
             processValues.push(process)
         }

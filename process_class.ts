@@ -1,5 +1,6 @@
 export class Process {
     private processId: number;
+    private priorityNumber: number;
     private arrivalTime: number;
     private burstTime: number;
     private remainingBursttime: number;
@@ -14,11 +15,12 @@ export class Process {
     private contextSwitch: number;
     private cpuUtilization: number;
 
-    public constructor(processId: number, arrivalTime: number, burstTime: number, contextSwitch: number) {
+    public constructor(processId: number, priorityNumber: number, arrivalTime: number, burstTime: number, contextSwitch: number) {
         this.processId = processId;
+        this.priorityNumber = priorityNumber;
         this.arrivalTime = arrivalTime;
-        this. burstTime = burstTime;
-        this. remainingBursttime = burstTime;
+        this.burstTime = burstTime;
+        this.remainingBursttime = burstTime;
         this.completionTime = -1;
         this.turnaroundTime = -1;
         this.waitingTime = -1;
@@ -41,6 +43,10 @@ export class Process {
 
     public addContextSwitching(contextSwitch: number) {
         this.arrivalTime += contextSwitch;
+    }
+
+    public getPriorityNumber() {
+        return this.priorityNumber;
     }
 
     public getCompletionTime() {
