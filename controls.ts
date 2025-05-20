@@ -1,5 +1,5 @@
 import { Process } from "./process_class.js"
-import { RoundRobin } from "./round_robin.js"
+import { Priority } from "./priority.js"
 
 const tableBody = document.getElementById("table-body") as HTMLElement
 const addRowButton = document.getElementById("add-row-button") as HTMLElement
@@ -81,12 +81,25 @@ decreaseRowButton.addEventListener("click", () => {
 submitButton.addEventListener("click", () => {
     const arrivalTimesInputs = tableBody.querySelectorAll(".arrival-time")
     const burstTimesInputs = tableBody.querySelectorAll(".burst-time")
+    const priorityNumberInputs = tableBody.querySelectorAll(".priority-number")
     let isValid = true;
 
     if(!timeQuantumInput.value) {
         timeQuantumInput.classList.add("is-danger")
         isValid = false;
     }
+
+    priorityNumberInputs.forEach(priorityNumbers => {
+        const priorityNumberInputs = priorityNumbers as HTMLInputElement
+
+        if (!priorityNumberInputs.value) {
+            priorityNumberInputs.classList.add("is-danger");
+            priorityNumberInputs.addEventListener("focus", () => {
+                priorityNumberInputs.classList.remove("is-danger")
+                isValid = false;
+            })
+        }
+    });    
 
     arrivalTimesInputs.forEach(arrivalTimes => {
         const arrivalTimesInput = arrivalTimes as HTMLInputElement
@@ -155,8 +168,8 @@ submitButton.addEventListener("click", () => {
             processValues.push(process)
         }
 
-        const roundRobin = new RoundRobin(processValues, Number(timeQuantumInput.value), 0);
-        roundRobin.computeProcess();
+        const PrioritySched = new Priority(processValues, Number(timeQuantumInput.value), 0);
+        PrioritySched.computeProcess();
 
         const completionTimestd = tableBody.querySelectorAll(".completion-time")
         const turnaroundTimestd = tableBody.querySelectorAll(".turn-around-time")

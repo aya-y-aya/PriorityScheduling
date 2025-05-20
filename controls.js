@@ -1,5 +1,5 @@
 import { Process } from "./process_class.js";
-import { RoundRobin } from "./round_robin.js";
+import { Priority } from "./priority.js";
 const tableBody = document.getElementById("table-body");
 const addRowButton = document.getElementById("add-row-button");
 const decreaseRowButton = document.getElementById("decrease-row-button");
@@ -122,8 +122,8 @@ submitButton.addEventListener("click", () => {
             const process = new Process(index, Number(arrivalTimesInput.value), Number(burstTimeInput.value), 0);
             processValues.push(process);
         }
-        const roundRobin = new RoundRobin(processValues, Number(timeQuantumInput.value), 0);
-        roundRobin.computeProcess();
+        const Priority = new Priority(processValues, Number(timeQuantumInput.value), 0);
+        Priority.computeProcess();
         const completionTimestd = tableBody.querySelectorAll(".completion-time");
         const turnaroundTimestd = tableBody.querySelectorAll(".turn-around-time");
         const waitingTimestd = tableBody.querySelectorAll(".waiting-time");

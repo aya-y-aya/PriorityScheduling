@@ -30,6 +30,7 @@
             <thead>
                 <tr>
                     <th class="has-text-centered">Process</th>
+                    <th class="has-text-centered">Priority</th>
                     <th class="has-text-centered">Arrival Time</th>
                     <th class="has-text-centered">Burst Time</th>
                     <th class="has-text-centered">Completion Time</th>
@@ -40,7 +41,7 @@
             </thead>
             <tfoot>
                 <tr>
-                    <th colspan="4">
+                    <th colspan="5">
                         <input id="add-row-button" type="button" value="Add Row" class="button is-dark is-primary" />
                         <input id="decrease-row-button" type="button" value="Decrease Row" class="button is-dark is-primary" />
                         <input id="submit-button" type="button" value="Submit" class="button is-dark is-primary" />
@@ -53,6 +54,9 @@
             <tbody id="table-body">
                 <tr>
                     <th class="has-text-centered is-align-content-center">P1</th>
+                    <td class="has-text-centered is-align-content-center">
+                        <input min="0" required type="number" class="input priority-number" />
+                    </td>
                     <td class="has-text-centered is-align-content-center">
                         <input min="0" required type="number" class="input arrival-time" />
                     </td>

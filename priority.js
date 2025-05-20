@@ -1,4 +1,4 @@
-export class RoundRobin {
+export class Priority {
     constructor(processes, timeQuanta, contextSwitch) {
         this.processes = processes;
         this.timeQuanta = timeQuanta;

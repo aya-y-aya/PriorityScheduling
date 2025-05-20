@@ -1,6 +1,6 @@
 import { Process } from "./process_class.js";
 
-export class RoundRobin {
+export class Priority {
     private processes: Process[];
     private timeQuanta : number;
     private contextSwitch: number;
