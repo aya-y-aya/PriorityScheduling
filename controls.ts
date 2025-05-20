@@ -18,6 +18,9 @@ addRowButton.addEventListener("click", () => {
     newRow.innerHTML = `
         <th class="has-text-centered is-align-content-center">P${processNumber}</th>
         <td class="has-text-centered is-align-content-center">
+            <input min="0" required type="number" class="input priority-number" />
+        </td>
+        <td class="has-text-centered is-align-content-center">
             <input min="0" required type="number" class="input arrival-time" />
         </td>
         <td class="has-text-centered is-align-content-center">
