@@ -2,19 +2,14 @@ import { Process } from "./process_class.js";
 
 export class Priority {
     private processes: Process[];
-    private timeQuanta : number;
 
-    public constructor(processes: Process[], timeQuanta: number) {
+    public constructor(processes: Process[]) { // timeQuanta removed
         this.processes = processes;
-        this.timeQuanta = timeQuanta;
     }
 
     public computeProcess() {
-        const timeQuanta: number = this.timeQuanta;
         var time: number = 0;
         var processDone: number = 0;
-        var readyQueueIndex: number = 0;
-        var ongoingProcess = 0;
         const readyQueue: number[] = [];
         let processTime = 0;
 
@@ -43,7 +38,7 @@ export class Priority {
                         // Lower priority number means higher priority
                         let inserted = false;
                         for (let j = 0; j < readyQueue.length; j++) {
-                            const currentProcessInQueue = this.processes[readyQueue[j]];
+                            const currentProcessInQueue = this.processes[readyQueue[j+1]];
                             if (element.getPriorityNumber() < currentProcessInQueue.getPriorityNumber()) {
                                 readyQueue.splice(j, 0, element.getProcessId()); // Insert before current
                                 inserted = true;
@@ -58,44 +53,38 @@ export class Priority {
             }
 
             if (readyQueue.length > 0) {
-                // In priority scheduling, the process to run is always the one with the highest priority
-                // which is at the front of our sorted readyQueue.
+                // In non-preemptive priority scheduling, the process with the highest priority
+                // (at the front of the readyQueue) runs until completion.
                 const currentProcessId = readyQueue[0];
                 const currentProcess = this.processes[currentProcessId];
 
-                // Handle the time slice / quantum logic for the current process
-                ongoingProcess++;
-
-                if (ongoingProcess > timeQuanta) {
-                    ongoingProcess = 1; // Reset for the next time slice
-
-                    if (currentProcess.getFirstArrivalTime() < 0) {
-                        currentProcess.setFirstArrivalTime(processTime);
-                    }
-
-                    currentProcess.pushToArrivalTimes(processTime);
-
-                    const remainingProcessTime = currentProcess.updateRemainingTime(timeQuanta);
-
-                    if (!currentProcess.getIsDoneProcessing()) {
-                        processTime += timeQuanta;
-                    } else {
-                        processDone++;
-                        processTime += remainingProcessTime; // Add only the remaining time if it finishes early
-                        completionTime = processTime; 
-                        currentProcess.computeValues(processTime); // Calculate metrics for the completed process
-
-                        // Remove the completed process from the readyQueue
-                        readyQueue.shift(); // Remove the first element (the completed process)
-                    }
-
-                    currentProcess.pushToCompletionTimes(processTime);
+                // Set first arrival time if not already set
+                if (currentProcess.getFirstArrivalTime() < 0) {
+                    currentProcess.setFirstArrivalTime(processTime);
                 }
+
+                // Add current process to gantt chart visualization data
+                currentProcess.pushToArrivalTimes(processTime);
+
+                // Execute the process for its entire remaining burst time
+                const timeToExecute = currentProcess.getRemainingBurstTime(); // Get full remaining burst time
+                const actualExecutedTime = currentProcess.updateRemainingTime(timeToExecute);
+
+                processTime += actualExecutedTime; // Advance time by the executed duration
+
+                if (currentProcess.getIsDoneProcessing()) {
+                    processDone++;
+                    completionTime = processTime;
+                    currentProcess.computeValues(processTime); // Calculate metrics for the completed process
+                    readyQueue.shift(); // Remove the completed process from the readyQueue
+                }
+
+                currentProcess.pushToCompletionTimes(processTime);
             } else {
                 processTime++;
             }
 
-            time++;
+            time++; 
         }
 
         const numberBar = document.getElementById("number-bar") as HTMLElement
@@ -116,7 +105,7 @@ export class Priority {
             for (let index1 = 0; index1 < completionTime; index1++) {
                 if (
                     (index1 >= arrivalTimes[timesIndex] &&
-                    index1 <  completionTimes[timesIndex])
+                    index1 < completionTimes[timesIndex])
                 ) {
                     ganttChartInnerHtml +=
                         '<div class="has-background-primary has-text-black"></div>';
@@ -134,5 +123,4 @@ export class Priority {
 
         ganttChartContainer.innerHTML = ganttChartInnerHtml;
     }
-
 }

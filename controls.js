@@ -4,12 +4,10 @@ const tableBody = document.getElementById("table-body");
 const addRowButton = document.getElementById("add-row-button");
 const decreaseRowButton = document.getElementById("decrease-row-button");
 const submitButton = document.getElementById("submit-button");
-const timeQuantumInput = document.getElementById("time-quantum-input");
+const timeQuantumInput = document.getElementById("time-quantum-input"); // This input will now be unused
 let processNumber = 1;
-
 addRowButton.addEventListener("click", () => {
     console.log("Add");
-
     processNumber++;
     const newRow = document.createElement("tr");
     newRow.innerHTML = `
@@ -71,20 +69,23 @@ submitButton.addEventListener("click", () => {
     const processValues = [];
     const arrivalTimesInputs = tableBody.querySelectorAll(".arrival-time");
     const burstTimesInputs = tableBody.querySelectorAll(".burst-time");
-    const priorityInputs = tableBody.querySelectorAll(".priority-number");
-
-    for (let index = 0; index < arrivalTimesInputs.length; index++) {
-        const arrivalTimesInput = arrivalTimesInputs[index];
-        const burstTimeInput = burstTimesInputs[index];
-        const priorityInput = priorityInputs[index];
-        const process = new Process(index, Number(arrivalTimesInput.value), Number(priorityInput.value), Number(burstTimeInput.value), 0);
-        processValues.push(process);
-    }
+    const priorityNumberInputs = tableBody.querySelectorAll(".priority-number");
     let isValid = true;
-    if (!timeQuantumInput.value) {
-        timeQuantumInput.classList.add("is-danger");
-        isValid = false;
-    }
+    // Remove the timeQuantumInput validation as it's no longer used
+    // if(!timeQuantumInput.value) {
+    //     timeQuantumInput.classList.add("is-danger")
+    //     isValid = false;
+    // }
+    priorityNumberInputs.forEach(priorityNumbers => {
+        const priorityNumberInput = priorityNumbers;
+        if (!priorityNumberInput.value) {
+            priorityNumberInput.classList.add("is-danger");
+            priorityNumberInput.addEventListener("focus", () => {
+                priorityNumberInput.classList.remove("is-danger");
+                isValid = false;
+            });
+        }
+    });
     arrivalTimesInputs.forEach(arrivalTimes => {
         const arrivalTimesInput = arrivalTimes;
         if (!arrivalTimesInput.value) {
@@ -130,12 +131,15 @@ submitButton.addEventListener("click", () => {
         let waitingTimeSum = 0;
         let expectedTotalBurstTime = 0;
         let finalCompletionTime = 0;
-
-        const priorityScheduler = new Priority(processValues, Number(timeQuantumInput.value), 0);
-        console.log("Before computeProcess");
-        priorityScheduler.computeProcess();
-        console.log("After computeProcess");
-
+        for (let index = 0; index < arrivalTimesInputs.length; index++) {
+            const priorityNumberInput = priorityNumberInputs[index]; // Corrected variable
+            const arrivalTimesInput = arrivalTimesInputs[index];
+            const burstTimeInput = burstTimesInputs[index];
+            const process = new Process(index, Number(priorityNumberInput.value), Number(arrivalTimesInput.value), Number(burstTimeInput.value), 0);
+            processValues.push(process);
+        }
+        const PrioritySched = new Priority(processValues); // Removed timeQuantumInput.value
+        PrioritySched.computeProcess();
         const completionTimestd = tableBody.querySelectorAll(".completion-time");
         const turnaroundTimestd = tableBody.querySelectorAll(".turn-around-time");
         const waitingTimestd = tableBody.querySelectorAll(".waiting-time");
@@ -154,8 +158,8 @@ submitButton.addEventListener("click", () => {
             responseTimeSum += processValues[index].getResponseTime();
         }
         burstTimesInputs.forEach(element => {
-            const burstTime = element;
-            expectedTotalBurstTime += Number(burstTime.innerText);
+            const burstTime = element; // Changed to HTMLInputElement
+            expectedTotalBurstTime += Number(burstTime.value); // Changed to .value
         });
         completionTimestd.forEach(element => {
             const completionTime = element;
@@ -174,9 +178,10 @@ submitButton.addEventListener("click", () => {
         averageWaitingTimeCell.textContent = `Average Waiting Time:\n${averageWaitingTime.toFixed(2).toString()}`;
     }
 });
-timeQuantumInput.addEventListener("focus", () => {
-    timeQuantumInput.classList.remove("is-danger");
-});
+// Removed timeQuantumInput event listener as it's no longer used
+// timeQuantumInput.addEventListener("focus", () => {
+//     timeQuantumInput.classList.remove("is-danger")
+// })
 function clearCells() {
     const completionTimestd = tableBody.querySelectorAll(".completion-time");
     const turnaroundTimestd = tableBody.querySelectorAll(".turn-around-time");

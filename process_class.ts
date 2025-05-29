@@ -69,22 +69,25 @@ export class Process {
         return this.firstArrivalTime;
     }
     
-
     public getProcessId() {
         return this.processId;
     }
 
-    public updateRemainingTime(timeQuanta : number) : number {
+    // Added for clarity in non-preemptive scheduling
+    public getRemainingBurstTime() : number {
+        return this.remainingBursttime;
+    }
 
-        if(this.remainingBursttime > timeQuanta) {
-            this.remainingBursttime -= timeQuanta;
-            return timeQuanta;
+    public updateRemainingTime(timeToExecute : number) : number { // Renamed parameter from timeQuanta
+        if(this.remainingBursttime > timeToExecute) {
+            this.remainingBursttime -= timeToExecute;
+            return timeToExecute;
         }
         else {
-            timeQuanta = this.remainingBursttime;
+            const actualExecutedTime = this.remainingBursttime;
             this.remainingBursttime = 0;
             this.isDoneProcessing = true;
-            return timeQuanta;
+            return actualExecutedTime;
         }
     }
 
@@ -119,5 +122,4 @@ export class Process {
     public getCompletionTimes() {
         return this.completionTimes;
     }
-
 }

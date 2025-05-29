@@ -1,96 +1,92 @@
-// process_class.js
 export class Process {
-    constructor(id, arrivalTime, priority, burstTime, responseTime = -1) {
-        this.id = id;
+    constructor(processId, priorityNumber, arrivalTime, burstTime, contextSwitch) {
+        this.isDoneProcessing = false;
+        this.arrivalTimes = [];
+        this.completionTimes = [];
+        this.processId = processId;
+        this.priorityNumber = priorityNumber;
         this.arrivalTime = arrivalTime;
-        this.priority = priority;
         this.burstTime = burstTime;
-        this.remainingTime = burstTime;
-        this.responseTime = responseTime;
+        this.remainingBursttime = burstTime;
         this.completionTime = -1;
         this.turnaroundTime = -1;
         this.waitingTime = -1;
+        this.responseTime = -1;
         this.firstArrivalTime = -1;
-        this.isDone = false;
-        this.arrivalTimes = [];
-        this.completionTimes = [];
+        this.contextSwitch = contextSwitch;
+        this.cpuUtilization = 0;
     }
-
-    getArrivalTime() {
-        return this.arrivalTime;
+    computeValues(completionTime) {
+        this.completionTime = completionTime;
+        this.turnaroundTime = this.completionTime - this.arrivalTime;
+        this.waitingTime = this.turnaroundTime - this.burstTime;
+        this.responseTime = this.firstArrivalTime - this.arrivalTime;
     }
-
-    getBurstTime() {
-        return this.burstTime;
+    getContextSwitching() {
+        return this.contextSwitch;
     }
-
-    getPriority() {
-        return this.priority;
+    addContextSwitching(contextSwitch) {
+        this.arrivalTime += contextSwitch;
     }
-
-    getIsDoneProcessing() {
-        return this.isDone;
+    getPriorityNumber() {
+        return this.priorityNumber;
     }
-
-    getFirstArrivalTime() {
-        return this.firstArrivalTime;
-    }
-
-    setFirstArrivalTime(time) {
-        this.firstArrivalTime = time;
-    }
-
-    pushToArrivalTimes(time) {
-        this.arrivalTimes.push(time);
-    }
-
-    pushToCompletionTimes(time) {
-        this.completionTimes.push(time);
-    }
-
-    getArrivalTimes() {
-        return this.arrivalTimes;
-    }
-
-    getCompletionTimes() {
-        return this.completionTimes;
-    }
-
     getCompletionTime() {
         return this.completionTime;
     }
-
+    getArrivalTime() {
+        return this.arrivalTime;
+    }
+    addArrivalTime(timeQuanta) {
+        this.arrivalTime += timeQuanta;
+    }
+    setFirstArrivalTime(firstArrivalTime) {
+        this.firstArrivalTime = firstArrivalTime;
+    }
+    getFirstArrivalTime() {
+        return this.firstArrivalTime;
+    }
+    getProcessId() {
+        return this.processId;
+    }
+    // Added for clarity in non-preemptive scheduling
+    getRemainingBurstTime() {
+        return this.remainingBursttime;
+    }
+    updateRemainingTime(timeToExecute) {
+        if (this.remainingBursttime > timeToExecute) {
+            this.remainingBursttime -= timeToExecute;
+            return timeToExecute;
+        }
+        else {
+            const actualExecutedTime = this.remainingBursttime;
+            this.remainingBursttime = 0;
+            this.isDoneProcessing = true;
+            return actualExecutedTime;
+        }
+    }
+    getIsDoneProcessing() {
+        return this.isDoneProcessing;
+    }
     getTurnaroundTime() {
         return this.turnaroundTime;
     }
-
     getWaitingTime() {
         return this.waitingTime;
     }
-
     getResponseTime() {
         return this.responseTime;
     }
-
-    setResponseTime(value) {
-        this.responseTime = value;
+    pushToArrivalTimes(arrivalTime) {
+        this.arrivalTimes.push(arrivalTime);
     }
-
-    updateRemainingTime(timeQuanta) {
-        const timeUsed = Math.min(this.remainingTime, timeQuanta);
-        this.remainingTime -= timeUsed;
-        if (this.remainingTime === 0) {
-            this.isDone = true;
-        }
-        return timeUsed;
+    getArrivalTimes() {
+        return this.arrivalTimes;
     }
-
-    computeValues(currentTime) {
-        this.completionTime = currentTime;
-        this.turnaroundTime = this.completionTime - this.arrivalTime;
-        this.waitingTime = this.turnaroundTime - this.burstTime;
-        if (this.responseTime === -1) {
-            this.responseTime = this.firstArrivalTime - this.arrivalTime;
-        }
+    pushToCompletionTimes(completionTime) {
+        this.completionTimes.push(completionTime);
+    }
+    getCompletionTimes() {
+        return this.completionTimes;
     }
 }

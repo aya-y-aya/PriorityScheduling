@@ -1,11 +1,11 @@
 import { Process } from "./process_class.js"
-import { Priority } from "./priority"
+import { Priority } from "./priority.js"
 
 const tableBody = document.getElementById("table-body") as HTMLElement
 const addRowButton = document.getElementById("add-row-button") as HTMLElement
 const decreaseRowButton = document.getElementById("decrease-row-button") as HTMLElement
 const submitButton = document.getElementById("submit-button") as HTMLInputElement
-const timeQuantumInput = document.getElementById("time-quantum-input") as HTMLInputElement
+const timeQuantumInput = document.getElementById("time-quantum-input") as HTMLInputElement // This input will now be unused
 
 let processNumber = 1;
 
@@ -88,10 +88,11 @@ submitButton.addEventListener("click", () => {
     const priorityNumberInputs = tableBody.querySelectorAll(".priority-number")
     let isValid = true;
 
-    if(!timeQuantumInput.value) {
-        timeQuantumInput.classList.add("is-danger")
-        isValid = false;
-    }
+    // Remove the timeQuantumInput validation as it's no longer used
+    // if(!timeQuantumInput.value) {
+    //     timeQuantumInput.classList.add("is-danger")
+    //     isValid = false;
+    // }
 
     priorityNumberInputs.forEach(priorityNumbers => {
         const priorityNumberInput = priorityNumbers as HTMLInputElement
@@ -103,7 +104,7 @@ submitButton.addEventListener("click", () => {
                 isValid = false;
             })
         }
-    });    
+    });     
 
     arrivalTimesInputs.forEach(arrivalTimes => {
         const arrivalTimesInput = arrivalTimes as HTMLInputElement
@@ -115,7 +116,7 @@ submitButton.addEventListener("click", () => {
                 isValid = false;
             })
         }
-    });    
+    });     
 
     burstTimesInputs.forEach(burstTimes => {
         const burstTimesInput = burstTimes as HTMLInputElement
@@ -127,32 +128,32 @@ submitButton.addEventListener("click", () => {
                 isValid = false;
             })
         }
-    });    
+    });     
 
     if (isValid) {
         if (arrivalTimesInputs.length <= 1) {
             // Only one process, don't compute
-        
+            
             const averageTurnaroundTimeCell = document.getElementById("average-turnaround-time") as HTMLElement;
             const averageResponseTimeCell = document.getElementById("average-response-time") as HTMLElement;
             const averageWaitingTimeCell = document.getElementById("average-waiting-time") as HTMLElement;
             const cpuUtilizationCell = document.getElementById("cpu-utilization") as HTMLElement;
             const aveIdleTimeCell = document.getElementById("ave-idle-time") as HTMLElement;
-        
-        
+            
+            
             averageTurnaroundTimeCell.textContent = `Average Turn Around Time:\n0`;
             averageResponseTimeCell.textContent = `Average Response Time:\n0`;
             averageWaitingTimeCell.textContent = `Average Waiting Time:\n0`;
             cpuUtilizationCell.textContent = `0`;
             aveIdleTimeCell.textContent = `0`;
-        
+            
             // Clear Gantt Chart
             const ganttChartContainer = document.getElementById("gantt-chart") as HTMLElement;
             const numberBar = document.getElementById("number-bar") as HTMLElement;
-        
+            
             ganttChartContainer.innerHTML = "";
             numberBar.innerHTML = "";
-        
+            
             return; // Stop executing further
         }
         
@@ -163,7 +164,7 @@ submitButton.addEventListener("click", () => {
         let finalCompletionTime = 0;
 
         for (let index = 0; index < arrivalTimesInputs.length; index++) {
-            const priorityNumberInput = arrivalTimesInputs[index] as HTMLInputElement
+            const priorityNumberInput = priorityNumberInputs[index] as HTMLInputElement // Corrected variable
             const arrivalTimesInput = arrivalTimesInputs[index] as HTMLInputElement
             const burstTimeInput = burstTimesInputs[index] as HTMLInputElement
 
@@ -172,7 +173,7 @@ submitButton.addEventListener("click", () => {
             processValues.push(process)
         }
 
-        const PrioritySched = new Priority(processValues, Number(timeQuantumInput.value));
+        const PrioritySched = new Priority(processValues); // Removed timeQuantumInput.value
         PrioritySched.computeProcess();
 
         const completionTimestd = tableBody.querySelectorAll(".completion-time")
@@ -199,9 +200,8 @@ submitButton.addEventListener("click", () => {
         }
 
         burstTimesInputs.forEach(element => {
-            const burstTime = element as HTMLElement
-
-            expectedTotalBurstTime += Number(burstTime.innerText)
+            const burstTime = element as HTMLInputElement // Changed to HTMLInputElement
+            expectedTotalBurstTime += Number(burstTime.value) // Changed to .value
         })
 
         completionTimestd.forEach(element => {
@@ -226,9 +226,10 @@ submitButton.addEventListener("click", () => {
     }
 })
 
-timeQuantumInput.addEventListener("focus", () => {
-    timeQuantumInput.classList.remove("is-danger")
-})
+// Removed timeQuantumInput event listener as it's no longer used
+// timeQuantumInput.addEventListener("focus", () => {
+//     timeQuantumInput.classList.remove("is-danger")
+// })
 
 function clearCells() {
     const completionTimestd = tableBody.querySelectorAll(".completion-time")

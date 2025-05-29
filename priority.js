@@ -1,118 +1,100 @@
 export class Priority {
-    constructor(processes, timeQuanta, contextSwitch) {
+    constructor(processes) {
         this.processes = processes;
-        this.timeQuanta = timeQuanta;
-        this.contextSwitch = contextSwitch;
     }
-
-computeProcess() {
-    const tq = this.timeQuanta;
-    const contextSwitch = this.contextSwitch;
-    const processes = this.processes;
-    let time = 0;
-    let completed = 0;
-    const n = processes.length;
-
-    const ganttChartContainer = document.getElementById("gantt-chart");
-    const numberBar = document.getElementById("number-bar");
-    ganttChartContainer.innerHTML = "";
-    numberBar.innerHTML = "";
-
-    let priorityQueues = {};  // Priority level => queue
-    let lastIndex = {};       // Tracks Round Robin within each priority
-
-    processes.forEach(p => {
-        if (!priorityQueues[p.priority]) {
-            priorityQueues[p.priority] = [];
-            lastIndex[p.priority] = 0;
-        }
-    });
-
-    const isAllDone = () => processes.every(p => p.getIsDoneProcessing());
-
-    while (completed < n) {
-        // Enqueue arrived and not done processes
-        processes.forEach(p => {
-            if (p.arrivalTime <= time && !p.getIsDoneProcessing() && !priorityQueues[p.priority].includes(p)) {
-                priorityQueues[p.priority].push(p);
+    computeProcess() {
+        var time = 0;
+        var processDone = 0;
+        const readyQueue = [];
+        let processTime = 0;
+        const ganttChartContainer = document.getElementById("gantt-chart");
+        let ganttChartInnerHtml = "";
+        ganttChartContainer.innerHTML = "";
+        let maxArrivalTime = 0;
+        let completionTime = 0;
+        this.processes.forEach((element) => {
+            if (element.getArrivalTime() > maxArrivalTime) {
+                maxArrivalTime = element.getArrivalTime();
             }
         });
-
-        const priorities = Object.keys(priorityQueues).map(Number).sort((a, b) => a - b);
-
-        let executed = false;
-
-        for (let prio of priorities) {
-            const queue = priorityQueues[prio];
-            if (queue.length === 0) continue;
-
-            const currentIndex = lastIndex[prio] % queue.length;
-            const p = queue[currentIndex];
-
-            if (p.arrivalTime > time || p.getIsDoneProcessing()) {
-                lastIndex[prio]++;
-                continue;
+        while (processDone < this.processes.length) {
+            // Add newly arrived processes to the readyQueue, maintaining priority order
+            if (time <= maxArrivalTime) {
+                for (let i = 0; i < this.processes.length; i++) {
+                    const element = this.processes[i];
+                    if (element.getArrivalTime() === time) {
+                        // Insert the new process into the readyQueue based on its priority
+                        // Lower priority number means higher priority
+                        let inserted = false;
+                        for (let j = 0; j < readyQueue.length; j++) {
+                            const currentProcessInQueue = this.processes[readyQueue[j + 1]];
+                            if (element.getPriorityNumber() < currentProcessInQueue.getPriorityNumber()) {
+                                readyQueue.splice(j, 0, element.getProcessId()); // Insert before current
+                                inserted = true;
+                                break;
+                            }
+                        }
+                        if (!inserted) {
+                            readyQueue.push(element.getProcessId()); // Add to the end if it has the lowest priority or queue is empty
+                        }
+                    }
+                }
             }
-
-            // Response Time
-            if (p.getFirstArrivalTime() === -1) {
-                p.setFirstArrivalTime(time);
-                p.setResponseTime(time - p.arrivalTime);
+            if (readyQueue.length > 0) {
+                // In non-preemptive priority scheduling, the process with the highest priority
+                // (at the front of the readyQueue) runs until completion.
+                const currentProcessId = readyQueue[0];
+                const currentProcess = this.processes[currentProcessId];
+                // Set first arrival time if not already set
+                if (currentProcess.getFirstArrivalTime() < 0) {
+                    currentProcess.setFirstArrivalTime(processTime);
+                }
+                // Add current process to gantt chart visualization data
+                currentProcess.pushToArrivalTimes(processTime);
+                // Execute the process for its entire remaining burst time
+                const timeToExecute = currentProcess.getRemainingBurstTime(); // Get full remaining burst time
+                const actualExecutedTime = currentProcess.updateRemainingTime(timeToExecute);
+                processTime += actualExecutedTime; // Advance time by the executed duration
+                if (currentProcess.getIsDoneProcessing()) {
+                    processDone++;
+                    completionTime = processTime;
+                    currentProcess.computeValues(processTime); // Calculate metrics for the completed process
+                    readyQueue.shift(); // Remove the completed process from the readyQueue
+                }
+                currentProcess.pushToCompletionTimes(processTime);
             }
-
-            p.pushToArrivalTimes(time);
-            const execTime = p.updateRemainingTime(tq);
-            time += execTime;
-            p.pushToCompletionTimes(time);
-
-            // Gantt drawing (same logic can remain)
-
-            if (p.getIsDoneProcessing()) {
-                p.computeValues(time);
-                queue.splice(currentIndex, 1);  // Remove completed process
-                if (queue.length === 0) delete priorityQueues[prio];
-                completed++;
-            } else {
-                lastIndex[prio] = (currentIndex + 1) % queue.length;
+            else {
+                processTime++;
             }
-
-            executed = true;
-            break;
+            time++;
         }
-
-        if (!executed) {
-            time++; // idle
+        const numberBar = document.getElementById("number-bar");
+        numberBar.innerHTML = "";
+        numberBar.style.gridTemplateColumns = "repeat(" + (completionTime + 1) + ", 1fr)";
+        for (let index1 = 0; index1 < completionTime + 1; index1++) {
+            numberBar.innerHTML += '<div class=" has-text-white has-text-right">' + index1 + '</div>';
         }
+        ganttChartContainer.style.gridTemplateColumns = "repeat(" + (completionTime + 1) + ", 1fr)";
+        for (let index = 0; index < this.processes.length; index++) {
+            ganttChartInnerHtml += '<div class="label"><strong>P' + (index + 1) + "</strong></div>";
+            let timesIndex = 0;
+            const arrivalTimes = this.processes[index].getArrivalTimes();
+            const completionTimes = this.processes[index].getCompletionTimes();
+            for (let index1 = 0; index1 < completionTime; index1++) {
+                if ((index1 >= arrivalTimes[timesIndex] &&
+                    index1 < completionTimes[timesIndex])) {
+                    ganttChartInnerHtml +=
+                        '<div class="has-background-primary has-text-black"></div>';
+                }
+                else {
+                    ganttChartInnerHtml +=
+                        '<div class="has-background has-text-black"></div>';
+                }
+                if ((completionTimes[timesIndex] - 1) == index1) {
+                    timesIndex++;
+                }
+            }
+        }
+        ganttChartContainer.innerHTML = ganttChartInnerHtml;
     }
-
-    const completionTime = Math.max(...processes.map(p => p.getCompletionTime()));
-
-    // Draw Gantt Chart time grid
-    numberBar.style.gridTemplateColumns = `repeat(${completionTime + 1}, 1fr)`;
-    for (let i = 0; i <= completionTime; i++) {
-        numberBar.innerHTML += `<div class="has-text-white has-text-right">${i}</div>`;
-    }
-
-    ganttChartContainer.style.gridTemplateColumns = `repeat(${completionTime + 1}, 1fr)`;
-    let ganttChartHtml = "";
-
-    processes.forEach((p, idx) => {
-        ganttChartHtml += `<div class="label"><strong>P${idx + 1}</strong></div>`;
-        let tIndex = 0;
-        const at = p.getArrivalTimes();
-        const ct = p.getCompletionTimes();
-        for (let t = 0; t < completionTime; t++) {
-            if (at[tIndex] !== undefined && t >= at[tIndex] && t < ct[tIndex]) {
-                ganttChartHtml += `<div class="has-background-primary has-text-black"></div>`;
-            } else {
-                ganttChartHtml += `<div class="has-background has-text-black"></div>`;
-            }
-            if (ct[tIndex] !== undefined && t === ct[tIndex] - 1) {
-                tIndex++;
-            }
-        }
-    });
-
-    ganttChartContainer.innerHTML = ganttChartHtml;
-}
 }
