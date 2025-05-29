@@ -5,121 +5,114 @@ export class Priority {
         this.contextSwitch = contextSwitch;
     }
 
-    computeProcess() {
-        const timeQuanta = this.timeQuanta;
-        const contextSwitch = this.contextSwitch;
-        let time = 0;
-        let processDone = 0;
-        const readyQueue = [];
-        let processTime = 0;
-        let completionTime = 0;
+computeProcess() {
+    const tq = this.timeQuanta;
+    const contextSwitch = this.contextSwitch;
+    const processes = this.processes;
+    let time = 0;
+    let completed = 0;
+    const n = processes.length;
 
-        const ganttChartContainer = document.getElementById("gantt-chart");
-        let ganttChartInnerHtml = "";
-        ganttChartContainer.innerHTML = "";
+    const ganttChartContainer = document.getElementById("gantt-chart");
+    const numberBar = document.getElementById("number-bar");
+    ganttChartContainer.innerHTML = "";
+    numberBar.innerHTML = "";
 
-        // Simulation loop
-        while (processDone < this.processes.length) {
-            // Add newly arrived processes
-            this.processes.forEach((element) => {
-                if (element.getArrivalTime() <= processTime &&
-                    !readyQueue.includes(element) &&
-                    !element.getIsDoneProcessing()
-                ) {
-                    readyQueue.push(element);
-                }
-            });
+    let priorityQueues = {};  // Priority level => queue
+    let lastIndex = {};       // Tracks Round Robin within each priority
 
-            if (readyQueue.length > 0) {
-                // Sort by priority (lower number is higher priority)
-                readyQueue.sort((a, b) => a.getPriority() - b.getPriority());
+    processes.forEach(p => {
+        if (!priorityQueues[p.priority]) {
+            priorityQueues[p.priority] = [];
+            lastIndex[p.priority] = 0;
+        }
+    });
 
-                let currentProcess = readyQueue.shift();
+    const isAllDone = () => processes.every(p => p.getIsDoneProcessing());
 
-                // Set response time once
-                if (currentProcess.getFirstArrivalTime() < 0) {
-                    currentProcess.setFirstArrivalTime(processTime);
-                    currentProcess.setResponseTime(processTime - currentProcess.getArrivalTime());
-                }
+    while (completed < n) {
+        // Enqueue arrived and not done processes
+        processes.forEach(p => {
+            if (p.arrivalTime <= time && !p.getIsDoneProcessing() && !priorityQueues[p.priority].includes(p)) {
+                priorityQueues[p.priority].push(p);
+            }
+        });
 
-                currentProcess.pushToArrivalTimes(processTime);
-                const actualExecutedTime = currentProcess.updateRemainingTime(timeQuanta);
-                processTime += actualExecutedTime;
+        const priorities = Object.keys(priorityQueues).map(Number).sort((a, b) => a - b);
 
-                if (!currentProcess.getIsDoneProcessing()) {
-                    // Add any new arrivals before pushing back
-                    this.processes.forEach((element) => {
-                        if (element.getArrivalTime() <= processTime &&
-                            !readyQueue.includes(element) &&
-                            !element.getIsDoneProcessing()
-                        ) {
-                            readyQueue.push(element);
-                        }
-                    });
+        let executed = false;
 
-                    // Push back for next round
-                    readyQueue.push(currentProcess);
-                } else {
-                    processDone++;
-                    currentProcess.computeValues(processTime);
-                    if (processTime > completionTime) {
-                        completionTime = processTime; // ✅ Track max completion time
-                    }
-                }
+        for (let prio of priorities) {
+            const queue = priorityQueues[prio];
+            if (queue.length === 0) continue;
 
-                // Apply context switch delay
-                if (contextSwitch > 0) {
-                    processTime += contextSwitch;
-                }
+            const currentIndex = lastIndex[prio] % queue.length;
+            const p = queue[currentIndex];
 
-                currentProcess.pushToCompletionTimes(processTime);
+            if (p.arrivalTime > time || p.getIsDoneProcessing()) {
+                lastIndex[prio]++;
+                continue;
+            }
+
+            // Response Time
+            if (p.getFirstArrivalTime() === -1) {
+                p.setFirstArrivalTime(time);
+                p.setResponseTime(time - p.arrivalTime);
+            }
+
+            p.pushToArrivalTimes(time);
+            const execTime = p.updateRemainingTime(tq);
+            time += execTime;
+            p.pushToCompletionTimes(time);
+
+            // Gantt drawing (same logic can remain)
+
+            if (p.getIsDoneProcessing()) {
+                p.computeValues(time);
+                queue.splice(currentIndex, 1);  // Remove completed process
+                if (queue.length === 0) delete priorityQueues[prio];
+                completed++;
             } else {
-                processTime++;
+                lastIndex[prio] = (currentIndex + 1) % queue.length;
             }
+
+            executed = true;
+            break;
         }
 
-        // Draw the Gantt chart and time numbers
-        const numberBar = document.getElementById("number-bar");
-        numberBar.innerHTML = "";
-        numberBar.style.gridTemplateColumns = `repeat(${completionTime + 1}, 1fr)`;
-
-        for (let index = 0; index < completionTime + 1; index++) {
-            numberBar.innerHTML += `<div class="has-text-white has-text-right">${index}</div>`;
+        if (!executed) {
+            time++; // idle
         }
-
-        ganttChartContainer.style.gridTemplateColumns = `repeat(${completionTime + 1}, 1fr)`;
-
-        for (let index = 0; index < this.processes.length; index++) {
-            ganttChartInnerHtml += `<div class="label"><strong>P${index + 1}</strong></div>`;
-            let timesIndex = 0;
-            const arrivalTimes = this.processes[index].getArrivalTimes();
-            const completionTimes = this.processes[index].getCompletionTimes();
-
-            for (let t = 0; t < completionTime; t++) {
-                if (arrivalTimes[timesIndex] !== undefined &&
-                    t >= arrivalTimes[timesIndex] &&
-                    t < completionTimes[timesIndex]
-                ) {
-                    ganttChartInnerHtml += `<div class="has-background-primary has-text-black"></div>`;
-                } else if (
-                    arrivalTimes[timesIndex] !== undefined &&
-                    t + contextSwitch === completionTimes[timesIndex] &&
-                    contextSwitch > 0
-                ) {
-                    ganttChartInnerHtml += `<div class="has-background-white has-text-black"></div>`;
-                } else {
-                    ganttChartInnerHtml += `<div class="has-background has-text-black"></div>`;
-                }
-
-                if (
-                    completionTimes[timesIndex] !== undefined &&
-                    t === completionTimes[timesIndex] - 1
-                ) {
-                    timesIndex++;
-                }
-            }
-        }
-
-        ganttChartContainer.innerHTML = ganttChartInnerHtml;
     }
+
+    const completionTime = Math.max(...processes.map(p => p.getCompletionTime()));
+
+    // Draw Gantt Chart time grid
+    numberBar.style.gridTemplateColumns = `repeat(${completionTime + 1}, 1fr)`;
+    for (let i = 0; i <= completionTime; i++) {
+        numberBar.innerHTML += `<div class="has-text-white has-text-right">${i}</div>`;
+    }
+
+    ganttChartContainer.style.gridTemplateColumns = `repeat(${completionTime + 1}, 1fr)`;
+    let ganttChartHtml = "";
+
+    processes.forEach((p, idx) => {
+        ganttChartHtml += `<div class="label"><strong>P${idx + 1}</strong></div>`;
+        let tIndex = 0;
+        const at = p.getArrivalTimes();
+        const ct = p.getCompletionTimes();
+        for (let t = 0; t < completionTime; t++) {
+            if (at[tIndex] !== undefined && t >= at[tIndex] && t < ct[tIndex]) {
+                ganttChartHtml += `<div class="has-background-primary has-text-black"></div>`;
+            } else {
+                ganttChartHtml += `<div class="has-background has-text-black"></div>`;
+            }
+            if (ct[tIndex] !== undefined && t === ct[tIndex] - 1) {
+                tIndex++;
+            }
+        }
+    });
+
+    ganttChartContainer.innerHTML = ganttChartHtml;
+}
 }
