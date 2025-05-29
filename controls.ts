@@ -82,6 +82,7 @@ decreaseRowButton.addEventListener("click", () => {
 })
 
 submitButton.addEventListener("click", () => {
+    const processValues : Process[] = [];
     const arrivalTimesInputs = tableBody.querySelectorAll(".arrival-time")
     const burstTimesInputs = tableBody.querySelectorAll(".burst-time")
     const priorityNumberInputs = tableBody.querySelectorAll(".priority-number")
@@ -160,7 +161,6 @@ submitButton.addEventListener("click", () => {
         let waitingTimeSum: number = 0;
         let expectedTotalBurstTime = 0;
         let finalCompletionTime = 0;
-        const processValues : Process[] = [];
 
         for (let index = 0; index < arrivalTimesInputs.length; index++) {
             const priorityNumberInput = arrivalTimesInputs[index] as HTMLInputElement

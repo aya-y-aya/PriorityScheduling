@@ -1,84 +1,96 @@
+// process_class.js
 export class Process {
-    constructor(processId, arrivalTime, burstTime, contextSwitch) {
-        this.isDoneProcessing = false;
-        this.arrivalTimes = [];
-        this.completionTimes = [];
-        this.processId = processId;
+    constructor(id, arrivalTime, priority, burstTime, responseTime = -1) {
+        this.id = id;
         this.arrivalTime = arrivalTime;
+        this.priority = priority;
         this.burstTime = burstTime;
-        this.remainingBursttime = burstTime;
+        this.remainingTime = burstTime;
+        this.responseTime = responseTime;
         this.completionTime = -1;
         this.turnaroundTime = -1;
         this.waitingTime = -1;
-        this.responseTime = -1;
         this.firstArrivalTime = -1;
-        this.contextSwitch = contextSwitch;
-        this.cpuUtilization = 0;
+        this.isDone = false;
+        this.arrivalTimes = [];
+        this.completionTimes = [];
     }
-    computeValues(completionTime) {
-        this.completionTime = completionTime;
-        this.turnaroundTime = this.completionTime - this.arrivalTime;
-        this.waitingTime = this.turnaroundTime - this.burstTime;
-        this.responseTime = this.firstArrivalTime - this.arrivalTime;
-    }
-    getContextSwitching() {
-        return this.contextSwitch;
-    }
-    addContextSwitching(contextSwitch) {
-        this.arrivalTime += contextSwitch;
-    }
-    getCompletionTime() {
-        return this.completionTime;
-    }
+
     getArrivalTime() {
         return this.arrivalTime;
     }
-    addArrivalTime(timeQuanta) {
-        this.arrivalTime += timeQuanta;
+
+    getBurstTime() {
+        return this.burstTime;
     }
-    setFirstArrivalTime(firstArrivalTime) {
-        this.firstArrivalTime = firstArrivalTime;
+
+    getPriority() {
+        return this.priority;
     }
+
+    getIsDoneProcessing() {
+        return this.isDone;
+    }
+
     getFirstArrivalTime() {
         return this.firstArrivalTime;
     }
-    getProcessId() {
-        return this.processId;
+
+    setFirstArrivalTime(time) {
+        this.firstArrivalTime = time;
     }
-    updateRemainingTime(timeQuanta) {
-        if (this.remainingBursttime > timeQuanta) {
-            this.remainingBursttime -= timeQuanta;
-            return timeQuanta;
-        }
-        else {
-            timeQuanta = this.remainingBursttime;
-            this.remainingBursttime = 0;
-            this.isDoneProcessing = true;
-            return timeQuanta;
-        }
+
+    pushToArrivalTimes(time) {
+        this.arrivalTimes.push(time);
     }
-    getIsDoneProcessing() {
-        return this.isDoneProcessing;
+
+    pushToCompletionTimes(time) {
+        this.completionTimes.push(time);
     }
-    getTurnaroundTime() {
-        return this.turnaroundTime;
-    }
-    getWaitingTime() {
-        return this.waitingTime;
-    }
-    getResponseTime() {
-        return this.responseTime;
-    }
-    pushToArrivalTimes(arrivalTime) {
-        this.arrivalTimes.push(arrivalTime);
-    }
+
     getArrivalTimes() {
         return this.arrivalTimes;
     }
-    pushToCompletionTimes(completionTime) {
-        this.completionTimes.push(completionTime);
-    }
+
     getCompletionTimes() {
         return this.completionTimes;
+    }
+
+    getCompletionTime() {
+        return this.completionTime;
+    }
+
+    getTurnaroundTime() {
+        return this.turnaroundTime;
+    }
+
+    getWaitingTime() {
+        return this.waitingTime;
+    }
+
+    getResponseTime() {
+        return this.responseTime;
+    }
+
+    setResponseTime(value) {
+        this.responseTime = value;
+    }
+
+    updateRemainingTime(timeQuanta) {
+        const timeUsed = Math.min(this.remainingTime, timeQuanta);
+        this.remainingTime -= timeUsed;
+        if (this.remainingTime === 0) {
+            this.isDone = true;
+        }
+        return timeUsed;
+    }
+
+    computeValues(currentTime) {
+        this.completionTime = currentTime;
+        this.turnaroundTime = this.completionTime - this.arrivalTime;
+        this.waitingTime = this.turnaroundTime - this.burstTime;
+        if (this.responseTime === -1) {
+            this.responseTime = this.firstArrivalTime - this.arrivalTime;
+        }
     }
 }
