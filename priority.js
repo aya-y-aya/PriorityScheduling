@@ -39,7 +39,7 @@ export class Priority {
             }
             // Select and execute the next process
             if (readyQueue.length > 0) {
-                // To get the highest priority process
+                // Toet the highest priority process
                 const currentProcess = readyQueue[0];
                 // This ensures the process doesn't start before it arrives.
                 if (currentTime < currentProcess.getArrivalTime()) {
@@ -50,9 +50,7 @@ export class Priority {
                     currentProcess.setFirstArrivalTime(currentTime);
                 }
                 currentProcess.pushToArrivalTimes(currentTime);
-                // In non-preemptive scheduling, the process runs for its entire burst time
-                const executionStartTime = currentTime;
-                const burstTime = currentProcess.getRemainingBurstTime(); // Use original burst time for full run
+                const burstTime = currentProcess.getRemainingBurstTime();
                 currentProcess.updateRemainingTime(burstTime);
                 currentTime += burstTime;
                 currentProcess.pushToCompletionTimes(currentTime);
