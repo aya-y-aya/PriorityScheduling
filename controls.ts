@@ -1,5 +1,5 @@
 import { Process } from "./process_class.js"
-import { Priority } from "./priority.js"
+import { Priority } from "./priority"
 
 const tableBody = document.getElementById("table-body") as HTMLElement
 const addRowButton = document.getElementById("add-row-button") as HTMLElement
@@ -172,7 +172,7 @@ submitButton.addEventListener("click", () => {
             processValues.push(process)
         }
 
-        const PrioritySched = new Priority(processValues, Number(timeQuantumInput.value), 0);
+        const PrioritySched = new Priority(processValues, Number(timeQuantumInput.value));
         PrioritySched.computeProcess();
 
         const completionTimestd = tableBody.querySelectorAll(".completion-time")
