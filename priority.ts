@@ -82,7 +82,7 @@ export class Priority {
                     } else {
                         processDone++;
                         processTime += remainingProcessTime; // Add only the remaining time if it finishes early
-                        completionTime = processTime; // This variable seems to be a global one for the last completion.
+                        completionTime = processTime; 
                         currentProcess.computeValues(processTime); // Calculate metrics for the completed process
 
                         // Remove the completed process from the readyQueue
