@@ -135,7 +135,7 @@ submitButton.addEventListener("click", () => {
             const priorityNumberInput = priorityNumberInputs[index]; // Corrected variable
             const arrivalTimesInput = arrivalTimesInputs[index];
             const burstTimeInput = burstTimesInputs[index];
-            const process = new Process(index, Number(priorityNumberInput.value), Number(arrivalTimesInput.value), Number(burstTimeInput.value), 0);
+            const process = new Process(index, Number(priorityNumberInput.value), Number(arrivalTimesInput.value), Number(burstTimeInput.value));
             processValues.push(process);
         }
         const PrioritySched = new Priority(processValues); // Removed timeQuantumInput.value

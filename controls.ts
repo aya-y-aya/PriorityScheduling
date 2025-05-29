@@ -168,7 +168,7 @@ submitButton.addEventListener("click", () => {
             const arrivalTimesInput = arrivalTimesInputs[index] as HTMLInputElement
             const burstTimeInput = burstTimesInputs[index] as HTMLInputElement
 
-            const process : Process = new Process(index, Number(priorityNumberInput.value),Number(arrivalTimesInput.value), Number(burstTimeInput.value), 0);
+            const process : Process = new Process(index, Number(priorityNumberInput.value),Number(arrivalTimesInput.value), Number(burstTimeInput.value));
 
             processValues.push(process)
         }
