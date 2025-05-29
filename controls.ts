@@ -1,5 +1,5 @@
 import { Process } from "./process_class.js"
-import { Priority } from "./priority.js"
+import { Priority } from "./priority"
 
 const tableBody = document.getElementById("table-body") as HTMLElement
 const addRowButton = document.getElementById("add-row-button") as HTMLElement
