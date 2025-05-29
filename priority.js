@@ -1,7 +1,6 @@
-import { Process } from "./process_class.js";
 export class Priority {
     constructor(processes) {
-        this.processes = processes.map(p => new Process(p.getProcessId(), p.getPriorityNumber(), p.getArrivalTime(), p.getRemainingBurstTime()));
+        this.processes = processes;
     }
     computeProcess() {
         let currentTime = 0;
@@ -10,13 +9,13 @@ export class Priority {
         const completedProcesses = [];
         // Initial sort by arrival time to ensure we consider processes in order of their availability
         this.processes.sort((a, b) => a.getArrivalTime() - b.getArrivalTime());
-        // For your existing Gantt chart visualization
+        // Gantt chart visualization
         const ganttChartContainer = document.getElementById("gantt-chart");
         let ganttChartInnerHtml = "";
         ganttChartContainer.innerHTML = "";
         let processIndex = 0;
         while (processesCompleted < this.processes.length) {
-            // Step 1: Add newly arrived processes to the ready queue
+            // Add newly arrived processes to the ready queue
             // Add all processes that have arrived *by* the current time to the ready queue
             while (processIndex < this.processes.length && this.processes[processIndex].getArrivalTime() <= currentTime) {
                 const arrivedProcess = this.processes[processIndex];
@@ -38,32 +37,26 @@ export class Priority {
                 }
                 processIndex++;
             }
-            // Step 2: Select and execute the next process
+            // Select and execute the next process
             if (readyQueue.length > 0) {
-                // Get the highest priority process (which will be at the front of the sorted readyQueue)
+                // To get the highest priority process
                 const currentProcess = readyQueue[0];
-                // If the CPU was idle before this process could start, advance currentTime to its arrival
                 // This ensures the process doesn't start before it arrives.
                 if (currentTime < currentProcess.getArrivalTime()) {
                     currentTime = currentProcess.getArrivalTime();
                 }
                 // If this is the first time this process starts executing, record its start time
-                if (currentProcess.getFirstArrivalTime() < 0) { // Assuming -1 or similar indicates not started
+                if (currentProcess.getFirstArrivalTime() < 0) {
                     currentProcess.setFirstArrivalTime(currentTime);
                 }
-                // Add current process to Gantt chart visualization data (for your existing logic)
-                currentProcess.pushToArrivalTimes(currentTime); // This records the start of its current execution segment
+                currentProcess.pushToArrivalTimes(currentTime);
                 // In non-preemptive scheduling, the process runs for its entire burst time
                 const executionStartTime = currentTime;
                 const burstTime = currentProcess.getRemainingBurstTime(); // Use original burst time for full run
-                // Simulate execution: update remaining time to 0 as it completes
-                currentProcess.updateRemainingTime(burstTime); // This will set remaining time to 0 and isDone to true
-                // Update current time to reflect the completion of this process
+                currentProcess.updateRemainingTime(burstTime);
                 currentTime += burstTime;
-                // This marks the end of its current execution segment
                 currentProcess.pushToCompletionTimes(currentTime);
-                // Since the process just completed, calculate its final metrics
-                currentProcess.computeValues(currentTime); // Pass the completion time
+                currentProcess.computeValues(currentTime);
                 // Move the completed process from readyQueue to completedProcesses
                 readyQueue.shift(); // Remove the completed process from the front
                 completedProcesses.push(currentProcess);
