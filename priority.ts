@@ -4,8 +4,6 @@ export class Priority {
     private processes: Process[];
 
     public constructor(processes: Process[]) {
-        // Create a deep copy of processes to ensure the original objects aren't mutated
-        // and each scheduling run starts with fresh process states.
         this.processes = processes.map(p => new Process(
             p.getProcessId(),
             p.getPriorityNumber(),
@@ -15,10 +13,10 @@ export class Priority {
     }
 
     public computeProcess() {
-        let currentTime: number = 0; // Represents the current simulated time
+        let currentTime: number = 0;
         let processesCompleted: number = 0;
-        const readyQueue: Process[] = []; // Stores Process objects, not just IDs
-        const completedProcesses: Process[] = []; // To keep track of processes that have finished
+        const readyQueue: Process[] = []; 
+        const completedProcesses: Process[] = []; 
 
         // Initial sort by arrival time to ensure we consider processes in order of their availability
         this.processes.sort((a, b) => a.getArrivalTime() - b.getArrivalTime());
@@ -26,9 +24,9 @@ export class Priority {
         // For your existing Gantt chart visualization
         const ganttChartContainer = document.getElementById("gantt-chart") as HTMLElement;
         let ganttChartInnerHtml: string = "";
-        ganttChartContainer.innerHTML = ""; // Clear previous chart
+        ganttChartContainer.innerHTML = ""; 
 
-        let processIndex = 0; // Tracks processes that have not yet arrived or been added to readyQueue
+        let processIndex = 0; 
 
         while (processesCompleted < this.processes.length) {
             // Step 1: Add newly arrived processes to the ready queue
@@ -99,12 +97,11 @@ export class Priority {
 
             } else {
                 // If the ready queue is empty, and there are still processes that haven't arrived yet,
-                // advance time to the arrival time of the next process to avoid busy-waiting in an idle state.
+                // advance time to the arrival time of the next process to avoid an idle state.
                 if (processIndex < this.processes.length) {
                     currentTime = this.processes[processIndex].getArrivalTime();
                 } else {
                     // No more processes to arrive and ready queue is empty.
-                    // This means all processes have been completed or there are no processes at all.
                     break;
                 }
             }
@@ -136,7 +133,6 @@ export class Priority {
             const arrivalTimes = this.processes[index].getArrivalTimes();
             const completionTimes = this.processes[index].getCompletionTimes();
 
-            // Correctly handle the case where a process might not have run or was short
             if (arrivalTimes.length === 0 || completionTimes.length === 0) {
                  for (let index1 = 0; index1 < maxCompletionTime; index1++) {
                      ganttChartInnerHtml += '<div class="has-background has-text-black"></div>';
@@ -151,11 +147,6 @@ export class Priority {
                     } else {
                         ganttChartInnerHtml += '<div class="has-background has-text-black"></div>';
                     }
-
-                    // // Advance timesIndex if the current segment ends
-                    // if (timesIndex < completionTimes.length && (completionTimes[timesIndex] - 1) === index1) {
-                    //     timesIndex++;
-                    // }
                 }
             }
         }
