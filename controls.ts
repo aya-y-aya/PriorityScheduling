@@ -172,7 +172,7 @@ submitButton.addEventListener("click", () => {
             processValues.push(process)
         }
 
-        const PrioritySched = new Priority(processValues, Number(timeQuantumInput.value), 0);
+        const PrioritySched = new Priority(processValues, Number(timeQuantumInput.value));
         PrioritySched.computeProcess();
 
         const completionTimestd = tableBody.querySelectorAll(".completion-time")
